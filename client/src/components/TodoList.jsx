@@ -1,45 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TodoItem from './TodoItem';
 
 function TodoList() {
 
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            text: "Doctor's appointment",
-            completed: true
-        },
-        {
-            id: 2,
-            text: "Meeting at School",
-            completed: false
-        },
-        {
-            id: 3,
-            text: "Playing Golf",
-            completed: false
-        },
-        {
-            id: 4,
-            text: "Go shopping",
-            completed: false
-        },
-    ]);
-
+    const [tasks, setTasks] = useState([]);
     const [text, setText] = useState('');
 
+    useEffect(() => {
+        fetch("http://127.0.0.1:5555/tasks")
+            .then((r) => r.json())
+            .then(setTasks);
+    }, []);
+
     function addTask(text) {
-        const newTask = {
-            id: Date.now(),
-            text,
-            completed: false
-        };
-        setTasks([...tasks, newTask]);
-        setText('');
+        // const newTask = {
+        //     id: Date.now(),
+        //     text,
+        //     completed: false
+        // };
+        fetch("http://127.0.0.1:5555/add_task", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ text: text, complete: false })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // If the request is successful, update the local state with the new task
+                    return response.json();
+                } else {
+                    throw new Error('Failed to add task');
+                }
+            })
+            .then(data => {
+                setTasks([...tasks, data]);
+                setText('');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     function deleteTask(id) {
-        setTasks(tasks.filter(task => task.id !== id))
+        fetch(`http://127.0.0.1:5555/delete_task/${id}`, {
+            method: "DELETE",
+        })
+            .then(response => {
+                if (response.ok) {
+                    setTasks(tasks.filter(task => task.id !== id));
+                } else {
+                    throw new Error('Failed to delete task');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     function toggleCompleted(id) {
@@ -54,23 +70,23 @@ function TodoList() {
     return (
 
         <div classname="todo-list">
-            
-                {tasks.map(task => (
-                    <TodoItem
-                        key={task.id}
-                        task={task}
-                        deleteTask={deleteTask}
-                        toggleCompleted={toggleCompleted}
-                    />
-                ))}
-                
-                <input
-                    value={text}
-                    placeholder="Enter task name here..."
-                    onChange={e => setText(e.target.value)}
+
+            {tasks.map(task => (
+                <TodoItem
+                    key={task.id}
+                    task={task}
+                    deleteTask={deleteTask}
+                    toggleCompleted={toggleCompleted}
                 />
-                <button onClick={() => addTask(text)}>Add New Task</button>
-            
+            ))}
+
+            <input
+                value={text}
+                placeholder="Enter task name here..."
+                onChange={e => setText(e.target.value)}
+            />
+            <button onClick={() => addTask(text)}>Add New Task</button>
+
 
         </div>
     );
