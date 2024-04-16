@@ -70,11 +70,12 @@ function TodoList() {
     }
     return (
 
-        <div classname="todo-list container">
+        <div classname="todo-item">
             <input
                 value={text}
                 placeholder="Enter task name here..."
                 onChange={e => setText(e.target.value)}
+                style={{ marginRight: "10px" }}
             />
             <button onClick={() => addTask(text)}>Add New Task</button>
             <br />
