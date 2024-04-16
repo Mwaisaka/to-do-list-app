@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TodoItem from './TodoItem';
 
+
 function TodoList() {
 
     const [tasks, setTasks] = useState([]);
@@ -69,7 +70,7 @@ function TodoList() {
     }
     return (
 
-        <div classname="todo-list">
+        <div classname="todo-list container">
             <input
                 value={text}
                 placeholder="Enter task name here..."
@@ -78,18 +79,19 @@ function TodoList() {
             <button onClick={() => addTask(text)}>Add New Task</button>
             <br />
             <br />
-            {tasks.map(task => (
-                <TodoItem
-                    key={task.id}
-                    task={task}
-                    deleteTask={deleteTask}
-                    toggleCompleted={toggleCompleted}
-                />
-            ))}
+            <div >
+                {tasks.map(task => (
+                    <div key={task.id} className="todo-item-container">
+                        <TodoItem
+                            task={task}
+                            deleteTask={deleteTask}
+                            toggleCompleted={toggleCompleted}
+                        />
+                    </div>
 
-            
+                ))}
 
-
+            </div>
         </div>
     );
 }
